@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时光回忆录</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 加载 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">时光回忆录</div>
+    </div>
+
+    <!-- 入场动画 -->
+    <div class="intro-stage" id="introStage">
+        <div class="intro-photos" id="introPhotos"></div>
+        <div class="intro-text" id="introText">
+            <div class="intro-title">时光回忆录</div>
+            <div class="intro-subtitle"></div>
+        </div>
+        <div class="start-recall" id="startRecall">
+            <button class="start-recall-btn" id="startRecallBtn">开始回忆</button>
+        </div>
+    </div>
+
+    <!-- 主舞台 -->
+    <div class="main-stage" id="mainStage">
+        <div class="bg-decoration"></div>
+
+        <!-- 顶部标题 -->
+        <div class="top-bar">
+            <h1>时光回忆录</h1>
+            <div class="progress-text" id="progressText">1 / 32</div>
+        </div>
+
+        <!-- 胶片容器 -->
+        <div class="filmstrip-viewport" id="filmstripViewport">
+            <div class="filmstrip-track" id="filmstripTrack">
+                <!-- 照片通过JS生成 -->
+            </div>
+            <!-- 胶片孔 -->
+            <div class="sprocket-holes top"></div>
+            <div class="sprocket-holes bottom"></div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- 再读一次信按钮 -->
+        <button class="read-letter-btn" id="readLetterBtn" style="display:none;">信</button>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">×</button>
+            <div class="modal-image">
+                <img id="modalImg" src="" alt="">
+            </div>
+            <div class="modal-content">
+                <div class="modal-date" id="modalDate"></div>
+                <div class="modal-message" id="modalMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 信件弹窗 -->
+    <div class="letter-overlay" id="letterOverlay">
+        <div class="letter">
+            <div class="letter-header">一封给你的信</div>
+            <div class="letter-body">
+                <p>亲爱的：</p>
+                <p>谢谢你陪我走过这些日子。</p>
+                <p>每一张照片，都是我们一起经历的时光。</p>
+                <p>从陌生到熟悉，从相遇到相知，每一步都值得珍惜。</p>
+                <p>未来的路还很长，我想继续和你一起走下去。</p>
+                <p>不管是晴天还是雨天，有你在身边就是最好的天气。</p>
+                <p>愿我们的故事，永远没有结局。</p>
+                <p class="letter-sign">永远爱你的人</p>
+            </div>
+            <button class="letter-close" id="letterClose">关闭</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
