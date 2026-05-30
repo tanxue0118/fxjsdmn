@@ -53,6 +53,7 @@ async function cacheImages() {
     try {
         const cache = await caches.open('photo-cache-v1');
         const files = photos.map(p => p.file);
+        files.push('1.mp3'); // 缓存音乐
         
         for (const file of files) {
             const response = await fetch(file);
@@ -60,14 +61,14 @@ async function cacheImages() {
                 await cache.put(file, response);
             }
         }
-        console.log('图片缓存完成');
+        console.log('缓存完成');
     } catch (e) {
         console.log('缓存失败:', e);
     }
 }
 
-// 加载图片时优先从缓存读取
-async function loadImage(file) {
+// 加载资源时优先从缓存读取
+async function loadFromCache(file) {
     try {
         const cache = await caches.open('photo-cache-v1');
         const cached = await cache.match(file);
@@ -129,7 +130,7 @@ function startIntro() {
         img.onerror = function() { this.src = getPlaceholder(i); };
         
         // 从缓存加载
-        loadImage(p.file).then(src => {
+        loadFromCache(p.file).then(src => {
             img.src = src;
         });
         
@@ -186,7 +187,7 @@ function initFilmstrip() {
         img.onerror = function() { this.src = getPlaceholder(i); };
         
         // 从缓存加载
-        loadImage(p.file).then(src => {
+        loadFromCache(p.file).then(src => {
             img.src = src;
         });
         
@@ -387,7 +388,7 @@ let isLastPhotoModal = false;
 
 function openModal(index) {
     const p = photos[index];
-    loadImage(p.file).then(src => {
+    loadFromCache(p.file).then(src => {
         document.getElementById('modalImg').src = src;
     });
     document.getElementById('modalDate').textContent = p.date;
@@ -430,20 +431,21 @@ let bgmAudio = null;
 
 function createBGM() {
     if (bgmAudio) return;
-    bgmAudio = new Audio('1.mp3');
-    bgmAudio.loop = true;
-    bgmAudio.volume = 0.6;
-    bgmAudio.play().catch(() => {
-        // 被拦截，等用户任意操作后播放
-        const handler = () => {
-            bgmAudio.play().catch(() => {});
-            document.removeEventListener('click', handler);
-            document.removeEventListener('touchstart', handler);
-            document.removeEventListener('keydown', handler);
-        };
-        document.addEventListener('click', handler);
-        document.addEventListener('touchstart', handler);
-        document.addEventListener('keydown', handler);
+    loadFromCache('1.mp3').then(src => {
+        bgmAudio = new Audio(src);
+        bgmAudio.loop = true;
+        bgmAudio.volume = 0.6;
+        bgmAudio.play().catch(() => {
+            const handler = () => {
+                bgmAudio.play().catch(() => {});
+                document.removeEventListener('click', handler);
+                document.removeEventListener('touchstart', handler);
+                document.removeEventListener('keydown', handler);
+            };
+            document.addEventListener('click', handler);
+            document.addEventListener('touchstart', handler);
+            document.addEventListener('keydown', handler);
+        });
     });
 }
 
