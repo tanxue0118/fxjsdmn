@@ -506,6 +506,10 @@ body {
     text-indent: 2em;
 }
 
+.letter-greeting {
+    text-indent: 0 !important;
+}
+
 .letter-sign {
     text-align: right;
     margin-top: 25px;
