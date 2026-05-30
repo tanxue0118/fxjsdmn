@@ -48,6 +48,36 @@ let scrollLeft = 0;
 let currentTranslateX = 0;
 let letterShown = false;
 
+// ========== 图片缓存 ==========
+async function cacheImages() {
+    try {
+        const cache = await caches.open('photo-cache-v1');
+        const files = photos.map(p => p.file);
+        
+        for (const file of files) {
+            const response = await fetch(file);
+            if (response.ok) {
+                await cache.put(file, response);
+            }
+        }
+        console.log('图片缓存完成');
+    } catch (e) {
+        console.log('缓存失败:', e);
+    }
+}
+
+// 加载图片时优先从缓存读取
+async function loadImage(file) {
+    try {
+        const cache = await caches.open('photo-cache-v1');
+        const cached = await cache.match(file);
+        if (cached) {
+            return URL.createObjectURL(await cached.blob());
+        }
+    } catch (e) {}
+    return file;
+}
+
 // ========== 入场动画 ==========
 function startIntro() {
     const stage = document.getElementById('introStage');
@@ -95,9 +125,13 @@ function startIntro() {
         photo.style.zIndex = i;
 
         const img = document.createElement('img');
-        img.src = p.file;
         img.alt = `回忆 ${i + 1}`;
         img.onerror = function() { this.src = getPlaceholder(i); };
+        
+        // 从缓存加载
+        loadImage(p.file).then(src => {
+            img.src = src;
+        });
         
         // 根据原图比例设置大小
         img.onload = function() {
@@ -147,10 +181,14 @@ function initFilmstrip() {
         card.className = 'film-card';
 
         const img = document.createElement('img');
-        img.src = p.file;
         img.alt = `回忆 ${i + 1}`;
         img.loading = 'lazy';
         img.onerror = function() { this.src = getPlaceholder(i); };
+        
+        // 从缓存加载
+        loadImage(p.file).then(src => {
+            img.src = src;
+        });
         
         // 根据原图比例设置宽度
         img.onload = function() {
@@ -349,7 +387,9 @@ let isLastPhotoModal = false;
 
 function openModal(index) {
     const p = photos[index];
-    document.getElementById('modalImg').src = p.file;
+    loadImage(p.file).then(src => {
+        document.getElementById('modalImg').src = src;
+    });
     document.getElementById('modalDate').textContent = p.date;
     document.getElementById('modalMessage').textContent = p.msg;
     document.getElementById('modalOverlay').classList.add('show');
@@ -408,6 +448,9 @@ function createBGM() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 缓存图片
+    cacheImages();
+    
     // 加载后显示入场动画
     setTimeout(() => {
         document.getElementById('loadingScreen').classList.add('hide');
